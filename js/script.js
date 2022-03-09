@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 showLoading("#main-content");
 $ajaxUtils.sendGetRequest(
   allCategoriesUrl,
-  [...], // ***** <---- TODO: STEP 1: Substitute [...] ******
+  buildAndShowHomeHTML, // ***** <---- TODO: STEP 1: Substitute [...] ******
   true); // Explicitly setting the flag to get JSON from server processed into an object literal
 });
 // *** finish **
@@ -97,12 +97,15 @@ function buildAndShowHomeHTML (categories) {
   $ajaxUtils.sendGetRequest(
     homeHtmlUrl,
     function (homeHtml) {
+      console.log("hello")
 
       // TODO: STEP 2: Here, call chooseRandomCategory, passing it retrieved 'categories'
       // Pay attention to what type of data that function returns vs what the chosenCategoryShortName
       // variable's name implies it expects.
       // var chosenCategoryShortName = ....
 
+      var chosenCategoryShortName = chooseRandomCategory(categories).short_name;
+      console.log(chosenCategoryShortName);
 
       // TODO: STEP 3: Substitute {{randomCategoryShortName}} in the home html snippet with the
       // chosen category from STEP 2. Use existing insertProperty function for that purpose.
@@ -117,16 +120,19 @@ function buildAndShowHomeHTML (categories) {
       //
       // var homeHtmlToInsertIntoMainPage = ....
 
+      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, 
+        "randomCategoryShortName", "'" + chosenCategoryShortName + "'")
 
       // TODO: STEP 4: Insert the produced HTML in STEP 3 into the main page
       // Use the existing insertHtml function for that purpose. Look through this code for an example
       // of how to do that.
       // ....
 
+      insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
+      
     },
     false); // False here because we are getting just regular HTML from the server, so no need to process JSON.
 }
-
 
 // Given array of category objects, returns a random category object.
 function chooseRandomCategory (categories) {
@@ -137,15 +143,13 @@ function chooseRandomCategory (categories) {
   return categories[randomArrayIndex];
 }
 
-
 // Load the menu categories view
 dc.loadMenuCategories = function () {
   showLoading("#main-content");
   $ajaxUtils.sendGetRequest(
     allCategoriesUrl,
     buildAndShowCategoriesHTML);
-};
-
+  }; 
 
 // Load the menu items view
 // 'categoryShort' is a short_name for a category
@@ -155,7 +159,6 @@ dc.loadMenuItems = function (categoryShort) {
     menuItemsUrl + categoryShort,
     buildAndShowMenuItemsHTML);
 };
-
 
 // Builds HTML for the categories page based on the data
 // from the server
@@ -211,8 +214,6 @@ function buildCategoriesViewHtml(categories,
   return finalHtml;
 }
 
-
-
 // Builds HTML for the single category page based on the data
 // from the server
 function buildAndShowMenuItemsHTML (categoryMenuItems) {
@@ -237,7 +238,6 @@ function buildAndShowMenuItemsHTML (categoryMenuItems) {
     },
     false);
 }
-
 
 // Using category and menu items data and snippets html
 // build menu items view HTML to be inserted into page
